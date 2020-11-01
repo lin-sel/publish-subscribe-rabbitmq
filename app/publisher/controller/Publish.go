@@ -12,11 +12,11 @@ import (
 
 // PublishController Have PublishService
 type PublishController struct {
-	PublishService service.PublishService
+	PublishService *service.PublishService
 }
 
 // NewPublishController Return New Object Of PublishController
-func NewPublishController(ser service.PublishService) *PublishController {
+func NewPublishController(ser *service.PublishService) *PublishController {
 	return &PublishController{
 		PublishService: ser,
 	}

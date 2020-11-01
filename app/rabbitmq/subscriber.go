@@ -1,17 +1,20 @@
 package rabbitmq
 
 import (
+	"github.com/lin-sel/pub-sub-rmq/app/subscriber/controller"
 	"github.com/streadway/amqp"
 )
 
 // Subscriber Have Chan, Queue
 type Subscriber struct {
-	Chan  *amqp.Channel
-	Queue amqp.Queue
+	Chan         *amqp.Channel
+	Queue        amqp.Queue
+	EventListner *controller.SubscriberController
 }
 
 // NewSubscriber Return New Object Of Subscriber
-func (pub *Subscriber) NewSubscriber(conn *amqp.Connection) (*Subscriber, error) {
+func NewSubscriber(conn *amqp.Connection,
+	eventListner *controller.SubscriberController) (*Subscriber, error) {
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, err
@@ -56,13 +59,14 @@ func (pub *Subscriber) NewSubscriber(conn *amqp.Connection) (*Subscriber, error)
 		nil,
 	)
 	return &Subscriber{
-		Chan:  ch,
-		Queue: q,
+		Chan:         ch,
+		Queue:        q,
+		EventListner: eventListner,
 	}, nil
 }
 
-// GetMessages Return Message
-func (pub *Subscriber) GetMessages(ch chan<- []byte) {
+// Subscribe fetch data from queue
+func (pub *Subscriber) Subscribe() {
 	msgs, _ := pub.Chan.Consume(
 		pub.Queue.Name, // queue
 		"",             // consumer
@@ -77,7 +81,7 @@ func (pub *Subscriber) GetMessages(ch chan<- []byte) {
 
 	go func() {
 		for d := range msgs {
-			ch <- d.Body
+			pub.EventListner.Add(d.Body)
 		}
 	}()
 	<-forever
