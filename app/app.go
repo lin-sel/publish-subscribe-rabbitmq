@@ -17,14 +17,15 @@ import (
 type App struct {
 	DB    *gorm.DB
 	Log   *logrus.Logger
-	route *mux.Router
+	Route *mux.Router
 }
 
 // NewApp Return New Object Of App
-func NewApp(db *gorm.DB, lg *logrus.Logger) *App {
+func NewApp(db *gorm.DB, lg *logrus.Logger, route *mux.Router) *App {
 	return &App{
-		DB:  db,
-		Log: lg,
+		DB:    db,
+		Log:   lg,
+		Route: route,
 	}
 }
 
@@ -65,7 +66,7 @@ func (app *App) RabbitMQConfig(contr *controller.SubscriberController) *rabbitmq
 	if err != nil {
 		app.Log.Error(err.Error())
 	}
-	subcriber.Subscribe()
+	go subcriber.Subscribe()
 	return publisher
 }
 
@@ -74,7 +75,7 @@ func (app *App) InitApp(contr *controller.SubscriberController) {
 	pub := app.RabbitMQConfig(contr)
 	app.RegisterPublisher(pub)
 	app.TableMigration()
-	if err := http.ListenAndServe(":8080", app.route); err != nil {
+	if err := http.ListenAndServe(":8080", app.Route); err != nil {
 		app.Log.Fatal(err.Error())
 	}
 }
@@ -83,5 +84,5 @@ func (app *App) InitApp(contr *controller.SubscriberController) {
 func (app *App) RegisterPublisher(pub *rabbitmq.Publisher) {
 	pubservice := pubser.NewPublishService(pub)
 	pubcontroller := pubcon.NewPublishController(pubservice)
-	pubcontroller.RegisterRoute(app.route)
+	pubcontroller.RegisterRoute(app.Route)
 }

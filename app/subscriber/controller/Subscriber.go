@@ -27,37 +27,29 @@ func NewSubscriberController(hotelser *service.HotelService,
 
 // Add Data to DB
 func (sub *SubscriberController) Add(data []byte) {
-	var hotel model.Hotel
-	err := json.Unmarshal(data, &hotel)
+	var js model.JSON
+	err := json.Unmarshal(data, &js)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	err = sub.HotelService.AddHotel(&hotel)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	for _, data := range js.Offers {
+		hotel := data.Hotel
+		err = sub.HotelService.AddHotel(&hotel)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 
-	var room model.Room
-	err = json.Unmarshal(data, &room)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+		room := data.Room
+		err = sub.RoomService.AddRoom(&room)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 
-	err = sub.RoomService.AddRoom(&room)
-	if err != nil {
-		fmt.Println(err.Error())
+		ratePlan := data.RatePlan
+		err = sub.RatePlanService.AddRatePlan(&ratePlan)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
-
-	var ratePlan model.RatePlan
-	err = json.Unmarshal(data, &ratePlan)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	err = sub.RatePlanService.AddRatePlan(&ratePlan)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 }

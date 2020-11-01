@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/lin-sel/pub-sub-rmq/app"
 	"github.com/lin-sel/pub-sub-rmq/app/log"
@@ -21,7 +22,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to connecto db error:%s", err.Error())
 	}
-	app := app.NewApp(db, log)
+	db.LogMode(true)
+	route := mux.NewRouter()
+	app := app.NewApp(db, log, route)
 	repo := repository.NewRepo()
 	hotelSer := service.NewHotelService(db, repo)
 	roomSer := service.NewRoomService(db, repo)
