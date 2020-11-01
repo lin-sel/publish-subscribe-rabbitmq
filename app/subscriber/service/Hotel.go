@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/jinzhu/gorm"
-	errors "github.com/lin-sel/pub-sub-rmq/error"
-	"github.com/lin-sel/pub-sub-rmq/model"
-	"github.com/lin-sel/pub-sub-rmq/repository"
+	errors "github.com/lin-sel/pub-sub-rmq/app/error"
+	"github.com/lin-sel/pub-sub-rmq/app/repository"
+	"github.com/lin-sel/pub-sub-rmq/app/subscriber/model"
 )
 
 // HotelService Contain DB, Repository
