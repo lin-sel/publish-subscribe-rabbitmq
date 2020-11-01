@@ -1,11 +1,11 @@
-package util
+package web
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
-	er "github.com/lin-sel/contact-app/error"
+	er "github.com/lin-sel/pub-sub-rmq/app/error"
 )
 
 // UnmarshalRequestBody Parse Request Body

@@ -1,10 +1,10 @@
-package util
+package web
 
 import (
 	"encoding/json"
 	"net/http"
 
-	err "github.com/lin-sel/contact-app/error"
+	err "github.com/lin-sel/pub-sub-rmq/app/error"
 )
 
 // RespondJSON Marshal Respond data & write to ResponseWriter
