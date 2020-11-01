@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -25,10 +26,12 @@ func NewPublishController(ser *service.PublishService) *PublishController {
 // RegisterRoute Register Endpoints
 func (pub *PublishController) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/publish", pub.AddData).Methods(http.MethodPost)
+	fmt.Println("API Publish")
 }
 
 // AddData Add Post To Data
 func (pub *PublishController) AddData(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Add Call")
 	if r.Body == nil {
 		web.RespondError(w, errors.NewHTTPError("request body has empty", http.StatusNoContent))
 	}
