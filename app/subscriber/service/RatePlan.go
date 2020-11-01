@@ -15,6 +15,14 @@ type RatePlanService struct {
 	Repository repository.Repository
 }
 
+// NewRatePlanService Return New Object Of RatePlanService
+func NewRatePlanService(db *gorm.DB, repo repository.Repository) *RatePlanService {
+	return &RatePlanService{
+		DB:         db,
+		Repository: repo,
+	}
+}
+
 // AddRatePlan Add New RatePlan Record
 func (rateplanservice *RatePlanService) AddRatePlan(room *model.RatePlan) error {
 	uow := repository.NewUnitOfWork(rateplanservice.DB, false)

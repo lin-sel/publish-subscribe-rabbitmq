@@ -3,8 +3,8 @@ package repository
 // Repository represents generic interface for interacting with DB
 type Repository interface {
 	Add(uow *UnitOfWork, target interface{}) error
-	Delete(uow *UnitOfWork, targetID interface{}, target interface{}, where ...interface{}) error
-	Update(uow *UnitOfWork, targetID interface{}, target interface{}) error
+	Delete(uow *UnitOfWork, target interface{}, where ...interface{}) error
+	Update(uow *UnitOfWork, target interface{}) error
 }
 
 // Repo implement Repository

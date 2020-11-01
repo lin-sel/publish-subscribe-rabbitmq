@@ -5,6 +5,9 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/lin-sel/pub-sub-rmq/app"
 	"github.com/lin-sel/pub-sub-rmq/app/log"
+	"github.com/lin-sel/pub-sub-rmq/app/repository"
+	"github.com/lin-sel/pub-sub-rmq/app/subscriber/controller"
+	"github.com/lin-sel/pub-sub-rmq/app/subscriber/service"
 )
 
 func getConnection() (db *gorm.DB, err error) {
@@ -19,5 +22,10 @@ func main() {
 		log.Fatalf("unable to connecto db error:%s", err.Error())
 	}
 	app := app.NewApp(db, log)
-	app.TableMigration()
+	repo := repository.NewRepo()
+	hotelSer := service.NewHotelService(db, repo)
+	roomSer := service.NewRoomService(db, repo)
+	ratePlanSer := service.NewRatePlanService(db, repo)
+	subContr := controller.NewSubscriberController(hotelSer, ratePlanSer, roomSer)
+	app.InitApp(subContr)
 }

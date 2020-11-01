@@ -15,6 +15,14 @@ type RoomService struct {
 	Repository repository.Repository
 }
 
+// NewRoomService Return New Object Of RoomService
+func NewRoomService(db *gorm.DB, repo repository.Repository) *RoomService {
+	return &RoomService{
+		DB:         db,
+		Repository: repo,
+	}
+}
+
 // AddRoom Add New Room Record
 func (roomservice *RoomService) AddRoom(room *model.Room) error {
 	uow := repository.NewUnitOfWork(roomservice.DB, false)

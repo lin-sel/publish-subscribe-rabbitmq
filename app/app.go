@@ -1,15 +1,23 @@
 package app
 
 import (
+	"net/http"
+
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"github.com/lin-sel/pub-sub-rmq/app/model"
+	pubcon "github.com/lin-sel/pub-sub-rmq/app/publisher/controller"
+	pubser "github.com/lin-sel/pub-sub-rmq/app/publisher/service"
+	"github.com/lin-sel/pub-sub-rmq/app/rabbitmq"
+	"github.com/lin-sel/pub-sub-rmq/app/subscriber/controller"
+	"github.com/lin-sel/pub-sub-rmq/app/subscriber/model"
 	"github.com/sirupsen/logrus"
 )
 
 // App DB, Log
 type App struct {
-	DB  *gorm.DB
-	Log *logrus.Logger
+	DB    *gorm.DB
+	Log   *logrus.Logger
+	route *mux.Router
 }
 
 // NewApp Return New Object Of App
@@ -44,4 +52,36 @@ func (app *App) TableMigration() {
 		AddForeignKey("hotel_id", "hotels(hotel_id)", "RESTRICT", "RESTRICT").Error; err != nil {
 		app.Log.Errorf("Foreign Key Error => %s", err.Error())
 	}
+}
+
+// RabbitMQConfig Config Messanger
+func (app *App) RabbitMQConfig(contr *controller.SubscriberController) *rabbitmq.Publisher {
+	conn, err := rabbitmq.NewRabbitMQ()
+	if err != nil {
+		app.Log.Error(err.Error())
+	}
+	publisher := rabbitmq.NewPublisher(conn)
+	subcriber, err := rabbitmq.NewSubscriber(conn, contr)
+	if err != nil {
+		app.Log.Error(err.Error())
+	}
+	subcriber.Subscribe()
+	return publisher
+}
+
+// InitApp App
+func (app *App) InitApp(contr *controller.SubscriberController) {
+	pub := app.RabbitMQConfig(contr)
+	app.RegisterPublisher(pub)
+	app.TableMigration()
+	if err := http.ListenAndServe(":8080", app.route); err != nil {
+		app.Log.Fatal(err.Error())
+	}
+}
+
+// RegisterPublisher Register Publisher
+func (app *App) RegisterPublisher(pub *rabbitmq.Publisher) {
+	pubservice := pubser.NewPublishService(pub)
+	pubcontroller := pubcon.NewPublishController(pubservice)
+	pubcontroller.RegisterRoute(app.route)
 }
